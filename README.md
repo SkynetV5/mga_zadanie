@@ -10,6 +10,10 @@
 
 # Uruchomienie
 
+## Sklonuj repozytorium
+
+```git clone https://github.com/SkynetV5/mga_zadanie.git```
+
 ## Utwórz i aktywuj wirtualne środowisko
 
 Na systemie Unix/MacOS
@@ -117,4 +121,14 @@ curl -X GET http://localhost:8000/api/history/ -H "Content-Type: application/jso
 - Historia zmian zadania:
 ```bash
 curl -X GET http://localhost:8000/api/history/{id}/ -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token"
+```
+-Filtrowanie zadań:
+
+Przykład - komenda zwróci zadania przypisane do zalogowanego użytkownika których status to "Nowy" oraz przypisany użytkownik jest równy null
+```bash
+curl -X GET "http://localhost:8000/api/tasks/?status=Nowy&assigned_user__isnull=true" -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token"
+```
+Przyklad - komenda zwróci historię zmian zadań, które mają status "Nowy" oraz w nazwie zawiera się słowo "test"
+```bash
+curl -X GET "http://localhost:8000/api/history/?status=Nowy&name_icontains=test" -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token"
 ```
