@@ -1,0 +1,7 @@
+Django>=3.0,<4.0
+djangorestframework
+psycopg2-binary
+djangorestframework-simplejwt
+django-simple-history
+django-filter
+pytest-django
