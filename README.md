@@ -122,7 +122,7 @@ curl -X GET http://localhost:8000/api/history/ -H "Content-Type: application/jso
 ```bash
 curl -X GET http://localhost:8000/api/history/{id}/ -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token"
 ```
--Filtrowanie zadań:
+- Filtrowanie zadań:
 
 Przykład - komenda zwróci zadania przypisane do zalogowanego użytkownika których status to "Nowy" oraz przypisany użytkownik jest równy null
 ```bash
