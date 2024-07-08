@@ -132,3 +132,9 @@ Przyklad - komenda zwróci historię zmian zadań, które mają status "Nowy" or
 ```bash
 curl -X GET "http://localhost:8000/api/history/?status=Nowy&name_icontains=test" -H "Content-Type: application/json" -H "Authorization: Bearer your_access_token"
 ```
+
+# Pytest
+
+## Uruchamianie Testów
+
+```pytest```
