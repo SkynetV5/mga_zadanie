@@ -23,15 +23,16 @@ class TaskViewSet(viewsets.ModelViewSet):
     filterset_fields = ['id','status','assigned_user']
     search_fields = ['name', 'description']
 
-    def perform_update(self, serializer, request, *args, **kwargs):
+    def perform_update(self, serializer,*args, **kwargs):
         user = self.request.user
         task = self.get_object()
 
         if task.assigned_user is None and not user.is_staff:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        instance = serializer.save()
-        change_reason = self.request.data.get('change_reason', '')
-        update_change_reason(instance, change_reason)
+            return Response({"detail": "Method \"UPDATE\" not allowed for non-staff users."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        else:
+            instance = serializer.save()
+            change_reason = self.request.data.get('change_reason', '')
+            update_change_reason(instance, change_reason)
 
     def destroy(self, request, *args, **kwargs):
         task = self.get_object()
