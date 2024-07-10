@@ -7,11 +7,12 @@ from .serializers import TaskSerializers, TaskHistorySerializers, RegisterSerial
 from rest_framework_simplejwt.tokens import RefreshToken
 from simple_history.utils import update_change_reason
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.db.models import Q
+
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -22,15 +23,28 @@ class TaskViewSet(viewsets.ModelViewSet):
     filterset_fields = ['id','status','assigned_user']
     search_fields = ['name', 'description']
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer, request, *args, **kwargs):
+        user = self.request.user
+        task = self.get_object()
+
+        if task.assigned_user is None and not user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         instance = serializer.save()
         change_reason = self.request.data.get('change_reason', '')
         update_change_reason(instance, change_reason)
 
+    def destroy(self, request, *args, **kwargs):
+        task = self.get_object()
+        if task.assigned_user is None and not request.user.is_staff:
+            return Response({"detail": "Method \"DELETE\" not allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(Q(assigned_user=user) | Q(assigned_user=None))
+        if user.is_staff:
+            return Task.objects.all()
+        else:
+            return Task.objects.filter(Q(assigned_user=user) | Q(assigned_user=None))
 
 
 
@@ -44,7 +58,10 @@ class TaskHistoryViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Task.history.filter(Q(assigned_user=user) | Q(assigned_user=None))
+        if user.is_staff:
+            return Task.history.all()
+        else:
+            return Task.history.filter(Q(assigned_user=user) | Q(assigned_user=None))
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
